@@ -124,9 +124,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 import pdfkit
 
-PDFKIT_CONFIG = pdfkit.configuration(
-    wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
-)
+PDFKIT_CONFIG = {
+    'wkhtmltopdf': os.path.join(BASE_DIR, 'bin', 'wkhtmltopdf')
+}
 
 from django.contrib.messages import constants as messages
 

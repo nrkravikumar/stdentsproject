@@ -75,8 +75,7 @@ def allstdntdetails(request):
 def preview_pdf(request):
     students = Student.objects.all()
     html_string = render_to_string('students_pdf.html', {'students': students})
-    pdf = pdfkit.from_string(html_string, False, configuration=settings.PDFKIT_CONFIG,
-        options={"enable-local-file-access": ""})
+    pdf = pdfkit.from_string(html_string, False, configuration=settings.PDFKIT_CONFIG(wkhtmltopdf=PDFKIT_CONFIG['wkhtmltopdf']))
     response = HttpResponse(pdf,content_type="application/pdf")
     response['Content-Disposition'] = 'inline; filename="students.pdf"'
     return response
@@ -84,8 +83,8 @@ def preview_pdf(request):
 def downld_pdf(request):
     students = Student.objects.all()
     html_string = render_to_string('students_pdf.html', {'students': students})
-    pdf = pdfkit.from_string(html_string, False, configuration=settings.PDFKIT_CONFIG,
-        options={"enable-local-file-access": ""})
+    pdf = pdfkit.from_string(html_string, False, configuration=settings.PDFKIT_CONFIG(wkhtmltopdf=PDFKIT_CONFIG['wkhtmltopdf']))
+    response = HttpResponse(pdf,content_type="application/pdf")
     response = HttpResponse(pdf,content_type="application/pdf")
     response['Content-Disposition'] = 'attachment; filename="students.pdf"'
     return response
