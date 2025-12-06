@@ -123,7 +123,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 import pdfkit
-
+import os
 PDFKIT_CONFIG = {
     'wkhtmltopdf': os.path.join(BASE_DIR, 'bin', 'wkhtmltopdf')
 }
