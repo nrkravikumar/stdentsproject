@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+  <div class="container">
+    <div class="row">
+      {% if st > 0 %}
+      {% for i in st %}
+      <div class="col-md-3">
+          <div class="card shadow-lg m-2">
+            <img src="{{ i.pfimg.url }}" class="card-img-top" style="height:150px; object-fit: cover;">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <p class="mb-0">
+                  <strong>Name: </strong> {{ i.fname }} {{ i.lname }}
+                </p>
+                <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ViewStudentModal{{i.id}}">
+                  <i class="fa-solid fa-angles-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- View Modal -->
+        <div class="modal fade" id="ViewStudentModal{{i.id}}" tabindex="-1" aria-labelledby="ViewStudentModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+          <div class="modal-dialog">
+            <form method="post">
+              <!-- {% csrf_token %} -->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="ViewStudentModalLabel">View Student</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="d-flex">
+                    <div class="flex-shrink-0">
+                      <img src="{{i.pfimg.url}}" class="rounded-circle ms-auto" style="height:90px;width:90px">
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                      <h6>Full Name: <b>{{i.fname}} {{i.lname}}</b></h6>
+                      <h6>Email-Id: <b>{{i.email}}</b></h6>
+                      <h6>Mobile: <b>{{i.mobile}}</b></h6>
+                      <h6>Joined On: <b>{{i.crted_date}}</b></h6>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <a href="{% url 'hm' %}" class="btn btn-secondary">Close <i class="fa-solid fa-circle-right"></i></a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div> 
+      {% endfor %}
+      {% else %}
+      <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+
+                <div class="card shadow-lg text-center p-4">
+                    <div class="card-body">
+                        <h5 class="mb-0"><i class="fa-solid fa-users fa-2x"></i> Students are not created yet.</h5>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+      </div>
+      {% endif %}
+      {% if cnt > 8 %}
+        <nav class="mt-4">
+          <ul class="pagination justify-content-end ms-auto">
+            {% if st.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ st.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+            {% for num in st.paginator.page_range %}
+            <li class="page-item {% if num == st.number %}active{% endif %}">
+              <a class="page-link" href="?page={{num}}">{{num}}</a>
+            </li>
+            {% endfor %}
+
+            {% if st.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ st.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+    {% endif %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}All Students{% endblock %}
+{% block content %}
+  <div class="container shadow-lg mt-5 p-5 border rounded">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex">
+        <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AddStudentModal"><i class="fa-solid fa-plus me-2"></i> Add Student</button>
+        <a href="{% url 'alstdnt' %}" class="btn btn-warning me-2"><i class="fa-solid fa-list"></i> Fetch All</a>
+        {% if cc > 0 %}
+        <a href="#" onclick="previewPDF()" class="btn btn-danger me-2"><i class="fa-solid fa-file-pdf"></i> View PDF</a>
+        <a href="#" onclick="downloadPDF()" class="btn btn-secondary"><i class="fa-solid fa-file-export"></i> Download PDF</a>
+        {% endif %}
+      </div>
+      <form method="post" action="" class="d-flex align-items-center">
+        {% csrf_token %}
+        <input type="text" name="searchquery" placeholder="Search here" class="form-control me-2" value="{{q}}">
+        <button type="submit" class="btn btn-success d-flex align-items-center" name="search"><i class="fa-solid fa-magnifying-glass me-2"></i> Search</button>  
+      </form>
+    </div>
+    <!-- Student Data in Table format -->
+    <table class="table mt-3 table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">First Name</th>
+          <th scope="col">Last Name</th>
+          <th scope="col">Emailid</th>
+          <th scope="col">Mobile</th>
+          <th scope="col" colspan="2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if y %}
+        {% for i in y %}
+        <tr>
+          <th scope="row">{{forloop.counter}}</th>
+          <td>{{i.fname}}</td>
+          <td>{{i.lname}}</td>
+          <td>{{i.email}}</td>
+          <td>{{i.mobile}}</td>
+          <td class="d-flex">
+            <a href="#" class="btn btn-warning btn-sm ml-2" data-bs-toggle="modal" data-bs-target="#ViewStudentModal{{i.id}}"><i class="fa-solid fa-eye-slash"></i></a>
+            <a href="#" class="btn btn-primary btn-sm mx-2" data-bs-toggle="modal" data-bs-target="#EditStudentModal{{i.id}}"><i class="fa-solid fa-user-pen"></i></a>
+            <a href="#" class="btn btn-danger btn-sm mr-2" data-bs-toggle="modal" data-bs-target="#DeleteStudentModal{{i.id}}"><i class="fa-solid fa-user-xmark"></i></a>
+          </td>
+        </tr>
+        <!-- View Student -->
+        <div class="modal fade" id="ViewStudentModal{{i.id}}" tabindex="-1" aria-labelledby="ViewStudentModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+          <div class="modal-dialog">
+            <form method="post">
+              {% csrf_token %}
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="ViewStudentModalLabel">View Student</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="d-flex">
+                    <div class="flex-shrink-0">
+                      <img src="{{i.pfimg.url}}" class="rounded-circle ms-auto" style="height:90px;width:90px">
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                      <h6>Full Name: <b>{{i.fname}} {{i.lname}}</b></h6>
+                      <h6>Email-Id: <b>{{i.email}}</b></h6>
+                      <h6>Mobile: <b>{{i.mobile}}</b></h6>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <a href="{% url 'alstdnt' %}" class="btn btn-secondary">Close <i class="fa-solid fa-circle-right"></i></a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div> 
+        <!-- Edit Modal -->
+        <div class="modal fade" id="EditStudentModal{{i.id}}" tabindex="-1" aria-labelledby="EditStudentModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+          <div class="modal-dialog">
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="EditStudentModalLabel">Edit Student</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body mx-3">
+                  <input type="hidden" name="id" value="{{i.id}}">
+                  {% for j in i.ep %}
+                    {{j}}
+                  {% endfor %}
+                </div>
+                <div class="modal-footer">
+                  <a href="{% url 'alstdnt' %}" class="btn btn-secondary">Close <i class="fa-solid fa-circle-right"></i></a>
+                  <button type="submit" class="btn btn-primary" name="update"><i class="fa-solid fa-user-check"></i> Update</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <!-- Delete Student -->
+        <div class="modal fade" id="DeleteStudentModal{{i.id}}" tabindex="-1" aria-labelledby="DeleteStudentModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+          <div class="modal-dialog">
+            <form method="post">
+              {% csrf_token %}
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="DeleteStudentModalLabel">Delete Student</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <input type="hidden" name="id" value="{{i.id}}">
+                  <h5>Are you sure want to delete {{i.fname}} {{i.lname}}?</h5>
+                </div>
+                <div class="modal-footer">
+                  <a href="{% url 'alstdnt' %}" class="btn btn-danger"><i class="fa-solid fa-user-slash"></i> No</a>
+                  <button type="submit" class="btn btn-success" name="delete">Yes Confirm <i class="fa-solid fa-user-minus"></i></button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <tr>
+          <th colspan="6">No records Found</th>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+    {% if cc > 5 %}
+    <nav class="mt-4">
+      <ul class="pagination justify-content-end ms-auto">
+        {% if y.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ y.previous_page_number }}">Previous</a>
+        </li>
+        {% endif %}
+        {% for num in y.paginator.page_range %}
+        <li class="page-item {% if num == y.number %}active{% endif %}">
+          <a class="page-link" href="?page={{num}}">{{num}}</a>
+        </li>
+        {% endfor %}
+
+        {% if y.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ y.next_page_number }}">Next</a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+
+<!-- Add Student Modal -->
+<div class="modal fade" id="AddStudentModal" tabindex="-1" aria-labelledby="AddStudentModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="AddStudentModalLabel">Add Student</h1>
+          <a href="{% url 'alstdnt' %}" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></a>
+        </div>
+        <div class="modal-body mx-3">
+          {% for i in g %}
+            {{i}}
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <a href="{% url 'alstdnt' %}" class="btn btn-secondary">Close <i class="fa-solid fa-circle-right"></i></a>
+          <button type="submit" class="btn btn-success" name="add"><i class="fa-solid fa-user-plus"></i> Add</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  // For add/edit/delete/pdf actions (with redirect)
+  {% if messages %}
+    {% for message in messages %}
+      Swal.fire({
+        icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
+        title: "{{ message }}",
+        showConfirmButton: false,
+        timer: 2000
+      });
+    {% endfor %}
+  {% endif %}
+
+  // For search results (no redirect)
+  {% if swal_message %}
+    Swal.fire({
+      icon: "{{ swal_icon }}",
+      title: "{{ swal_message }}",
+      showConfirmButton: false,
+      timer: 2000
+    });
+  {% endif %}
+
+
+function previewPDF() {
+  Swal.fire({
+    icon: 'success',
+    title: 'PDF Generated Successfully',
+    timer: 1500,
+    showConfirmButton: false
+  });
+  // Open PDF after short delay
+  setTimeout(function(){
+    window.open("{% url 'prvw_pdf' %}", "_blank");
+  }, 1500);
+}
+
+function downloadPDF() {
+  Swal.fire({
+    icon: 'success',
+    title: 'Downloading PDF...',
+    timer: 1500,
+    showConfirmButton: false
+  });
+
+  setTimeout(function(){
+    window.location.href = "{% url 'dwn_pdf' %}";
+  }, 1500);
+}
+</script>
+
+
+{% endblock %}
+
