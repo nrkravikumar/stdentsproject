@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-qm3=k595actsx*wwnu_zgh4$*ze^u0-7dj4e(-n76&oz(fxt%&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -123,7 +123,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 import pdfkit
-
+import os
 PDFKIT_CONFIG = {
     'wkhtmltopdf': os.path.join(BASE_DIR, 'bin', 'wkhtmltopdf')
 }
